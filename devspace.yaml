@@ -1,0 +1,33 @@
+version: v1beta6
+images:
+  image1:
+    image: josephturi/py-red-sql
+    tag: latest
+    dockerfile: ./Build/Dockerfile
+    context: ./Build/
+    build:
+      docker:
+        skipPush: true
+
+deployments:
+  ### deployment with kubectl
+  - name: multocontainer2
+    kubectl:
+      manifests:
+        - ./Deploy/*
+dev:
+  ports:
+    - imageName: image1
+      forward:
+        - port: 5010
+          remotePort: 5000
+  open:
+    - url: http://localhost:5010/c
+  sync:
+    - imageName: image1
+      localSubPath: ./Build
+      containerPath: .
+      excludePaths:
+        - Dockerfile
+        - .devspace/
+        - devspace.yaml
